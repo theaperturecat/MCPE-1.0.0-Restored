@@ -1,0 +1,1 @@
+cmake . -Bbuild/win32 -DPLATFORMH=WINDOWS

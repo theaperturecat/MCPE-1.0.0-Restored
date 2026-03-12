@@ -1,0 +1,8 @@
+
+namespace mce
+{
+	class Mesh
+	{
+
+	};
+}

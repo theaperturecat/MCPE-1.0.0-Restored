@@ -1,0 +1,11 @@
+*.exe
+*.dll
+*.lib
+*.obj
+.vs/
+*.VC.db
+*.VC.opendb
+*.sdf
+*.ipch
+*.vcproj
+handheld/source/build
