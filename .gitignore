@@ -1,0 +1,4 @@
+handheld/build/win32/*
+handheld/data/*
+!handheld/data/restore/shaders/*
+.vscode/*
