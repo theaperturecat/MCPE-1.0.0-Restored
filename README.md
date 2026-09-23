@@ -1,3 +1,4 @@
+# This branch should not be used anymore as 'retry' is now the latest one which can build and render chunks.
 # Minecraft Pocket Edition 1.0.0 Partial Source Code
 When the Minecraft Dungeons source code leaked, contained in it was a lot of the pocket edition 1.0.0 source code half merged into the unreal game engine. The earliest commit in that repo contains the most, but a lot is still missing or commented out(Just to get it to compile?). I have uncommented a lot, removed unreal and fixed a lot, but there is a LOT more code missing+broken, so you can't compile ordinary minecraft from it yet. It still could be used to make SDKs, backport features to LCE/0.6.2 and it might even be possible to compile MCPE 1.0.0 from it eventually, after a lot of work.
 
