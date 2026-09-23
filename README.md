@@ -61,5 +61,5 @@ Contributions are welcome. Create a pull request fixing an issue or restoring a 
 
 ## Images
 ![Minecraft rendered in the restoration](images/screenshot-renderer.png)
-![Side view of a chunk](images/SideLayer0.bmp.png)
+![Side view of a chunk](images/SideLayer0.bmp)
 ![The end](images/screenshot-end.png)
