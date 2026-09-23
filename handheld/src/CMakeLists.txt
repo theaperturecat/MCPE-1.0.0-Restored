@@ -60,7 +60,15 @@ set(USEGUI 0)
 endif()
 
 
+
+
 if(COMPILE_PLATFORM STREQUAL "WINDOWS")
+
+set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT minecraftpe)
+
+set_property(TARGET minecraftpe PROPERTY 
+    VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/../data/"
+)
 
 target_compile_definitions(minecraftpe
 PRIVATE NOMINMAX=1)

@@ -1,2 +1,2 @@
-cmake . -B../build/win32 -DPLATFORMH=WINDOWS
+cmake . -B../build/win32
 pause
