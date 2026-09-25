@@ -2,7 +2,7 @@
 *   (c) Mojang. All rights reserved                       *
 *   (c) Microsoft. All rights reserved.                   *
 *********************************************************/
-#include "Dungeons.h"
+#include "common_header.h"
 
 #include "world/entity/EntityTypes.h"
 #include "world/entity/EntityClassTree.h"

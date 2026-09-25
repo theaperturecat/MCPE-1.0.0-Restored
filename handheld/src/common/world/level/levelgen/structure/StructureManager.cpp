@@ -3,10 +3,10 @@
 *  (c) Microsoft. All rights reserved.                  *
 *********************************************************/
 
-#include "Dungeons.h"
+#include "common_header.h"
 
 #include "world/level/levelgen/structure/StructureManager.h"
-//#include "world/level/block/entity/StructureBlockEntity.h"
+#include "world/level/block/entity/StructureBlockEntity.h"
 #include "Core/Resource/ResourceHelper.h"
 #include "util/StringByteInput.h"
 #include "util/StringByteOutput.h"
@@ -77,7 +77,10 @@ StructureTemplate* StructureManager::_readStructure(const std::string& name) {
  		return nullptr;
  	}
 #else
-	return nullptr;
+	std::string templatePath = std::string("./") + StructureBlockEntity::STRUCTURE_ASSET_FILE_PREFIX + name + StructureBlockEntity::STRUCTURE_FILE_POSTFIX;//AppPlatform::singleton().getAssetFileFullPath(StructureBlockEntity::STRUCTURE_ASSET_FILE_PREFIX + name + StructureBlockEntity::STRUCTURE_FILE_POSTFIX);
+	if (!GzipUtil::decompressNBTFromAssets(templatePath, data)) {
+		return nullptr;
+	}
 #endif
 	Unique<StructureTemplate> structure = std::make_unique<StructureTemplate>();
 	if (load(*structure, data) && name.length() > 0) {

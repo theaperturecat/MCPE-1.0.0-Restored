@@ -2,7 +2,7 @@
 *  (c) Mojang.    All rights reserved.                  *
 *  (c) Microsoft. All rights reserved.                  *
 *********************************************************/
-#include "Dungeons.h"
+#include "common_header.h"
 
 #include "world/level/block/SlabBlock.h"
 #include "world/level/material/Material.h"

@@ -13,12 +13,13 @@
 #include "renderer/texture/TextureAtlas.h"
 #include "shader.h"
 #include <world/level/FoliageColor.h>
+#include "renderer/renderer/RenderMaterialGroup.h"
 
 
 int screenx = 1600;
 int screeny = 900;
 
-Shader* sptr;
+//Shader* sptr;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -31,7 +32,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 		(float)screenx / (float)screeny,
 		0.1f, 1000.0f);
 
-	sptr->setMatrix4("projection", glm::value_ptr(projection));
+	//sptr->setMatrix4("projection", glm::value_ptr(projection));
 
 }
 
@@ -309,35 +310,32 @@ void renderThreadStuff()
 	bool cursor_locked = true;
 
 
-	std::vector<RenderChunk*> rc;
 
-	std::unordered_set<ChunkPos> renderChunkMap;
 
 
 
 	//RenderChunk rc[8]; (BlockPos(0, 0, 0));
 
 	RenderChunkRenderParameters renderParams;
-	renderParams.layer = TerrainLayer::Far;//?
+	renderParams.layer = TerrainLayer::Opaque;//?
+	renderParams.forceUnsorted = false;
+	renderParams.forceFog = false;
 
+	mce::RenderMaterialGroup::switchable.InitRenderMaterials();
 
-	ShaderComponent mainVertex("./restore/shaders/test_textured.vs", VERTEX_SHADER);
-	ShaderComponent mainFragment("./restore/shaders/test_textured.fs", FRAGMENT_SHADER);
+	//ShaderComponent mainVertex("./restore/shaders/test_textured.vs", VERTEX_SHADER);
+	//ShaderComponent mainFragment("./restore/shaders/test_textured.fs", FRAGMENT_SHADER);
 
-	Shader shader(mainVertex, mainFragment);
-	shader.activate();
-	shader.setInt("atlas", 0);
+	//Shader shader(mainVertex, mainFragment);
+	//shader.activate();
+	//shader.setInt("atlas", 0);
 	//glUniform1i(glGetUniformLocation(shader, "atlas"), 0);//set the atlas to be texture 0
 
 	Camera c;
 
-	sptr = &shader;
+	//sptr = &shader;
 
-	glm::mat4 projection = glm::perspective(glm::radians(85.0f),
-		(float)screenx / (float)screeny,
-		0.1f, 1000.0f);
 
-	shader.setMatrix4("projection", glm::value_ptr(projection));
 
 	ResourceLocation metaFile("textures/terrain_texture.json");
 
@@ -382,6 +380,22 @@ void renderThreadStuff()
 	{ 1, 1 }
 	};
 
+	mce::MaterialPtr chunkMaterial = mce::RenderMaterialGroup::switchable.getMaterial("terrain_opaque");
+	
+	glm::mat4 projection = glm::perspective(glm::radians(85.0f),
+		(float)screenx / (float)screeny,
+		0.1f, 1000.0f);
+
+	chunkMaterial->myShader->setMatrix4("PROJ", glm::value_ptr(projection));
+
+	chunkMaterial->myShader->setInt("TEXTURE_0", 0);
+
+	std::unordered_map<ChunkPos,RenderChunk*[8]> rc;
+
+	//std::unordered_set<ChunkPos> renderChunkMap;
+
+	std::unordered_set<ChunkPos> needsReRendering;
+
 	while (!glfwWindowShouldClose(window)) 
 	{
 		lastFrame = currentFrame;
@@ -394,13 +408,15 @@ void renderThreadStuff()
 		//run stuff here 
 		c.UpdateCam(deltaTime);
 		glm::mat4 view = glm::lookAt(c.cameraPos, c.cameraPos + c.cameraFront, c.cameraUp);
-		shader.setMatrix4("view", glm::value_ptr(view));
+		
+		//chunkMaterial->myShader->setVector4("CHUNK_ORIGIN_AND_SCALE", glm::vec4(0, 0, 0, 1));
+		chunkMaterial->myShader->setMatrix4("WORLDVIEW", glm::value_ptr(view));
 
 		ChunkPos camChunkPos(c.cameraPos.x/16,c.cameraPos.z/16);
 		int renderDistance = 3;
 		int loadDistance = renderDistance+1;//account for post-processing requiring chunks around it to be loaded
 
-		std::vector<ChunkPos> needsReRendering;
+		
 
 		for (int x = -loadDistance; x <= loadDistance; x++)
 		{
@@ -408,62 +424,81 @@ void renderThreadStuff()
 			{
 				ChunkPos cp(camChunkPos.x+x, camChunkPos.z+z);
 
-				if (renderChunkMap.find(cp) == renderChunkMap.end())
+				if (rc.find(cp) == rc.end())
 				{
 					commandContext.dim->getChunkSource().getOrLoadChunk(cp, ChunkSource::LoadMode::Deferred);
-					needsReRendering.push_back(cp);
+					needsReRendering.insert(cp);
+					
 				}
-
-				//if (commandContext.dim->getChunkSource().getExistingChunk(cp) == nullptr)
-				//{
-				//	commandContext.dim->getChunkSource().getOrLoadChunk(cp, ChunkSource::LoadMode::Deferred);
-				//	needsReRendering.push_back(cp);//todo this is also for chunk changes, but we dont have them working yet. We also dont have clearing the renderchunk list working yet, but we dont need them yet either
-//
-				//}
 			}
 		}
 
 
-		for (int l = 0; l < needsReRendering.size(); l++)
-		{
-			if (commandContext.dim->getChunkSource().getOrLoadChunk(needsReRendering[l], ChunkSource::LoadMode::None)->getState() == ChunkState::Loaded)
+
+			for (auto it = needsReRendering.begin(); it != needsReRendering.end(); )
 			{
-				int k = rc.size();
-				for (int i = 0; i < 8; i++)
+
+
+				ChunkPos pos = *it;
+
+				if (commandContext.dim->getChunkSource().getOrLoadChunk(pos, ChunkSource::LoadMode::None)->getState() == ChunkState::Loaded)
 				{
-					BlockPos cp(needsReRendering[l].x * 16, i * 16, needsReRendering[l].z * 16);
+					std::cout << "Rendering chunk at " << pos.x << ", " << pos.z << " ChunkPos\n";
+					//int k = rc.size();
+					for (int i = 0; i < 8; i++)
+					{
+						BlockPos cp(pos.x * 16, i * 16, pos.z * 16);
 
 
 
-					std::cout << "Loading chunk at " << cp.toString() << "\n";
-					rc.push_back(new RenderChunk(cp));
 
-					rc[k + i]->startRebuild(make_unique<RenderChunkBuilder>(commandContext.dim->getChunkSource()));
-					rc[k + i]->rebuild(false, false);
-					rc[k + i]->endRebuild(Vec3(c.cameraPos.x, c.cameraPos.y, c.cameraPos.z));
-					//rc[k + i]->startFaceSort(make_unique<RenderChunkSorter>()); todo when this is fixed...
-					//rc[k + i]->faceSort();
-					//rc[k + i]->endFaceSort();
+						RenderChunk* chunkPart = new RenderChunk(cp);
+
+						chunkPart->startRebuild(make_unique<RenderChunkBuilder>(commandContext.dim->getChunkSource()));
+						chunkPart->rebuild(false, true);
+						chunkPart->endRebuild(Vec3(c.cameraPos.x, c.cameraPos.y, c.cameraPos.z));
+						/*					chunkPart->startFaceSort(make_unique<RenderChunkSorter>());
+						chunkPart->faceSort();
+						chunkPart->endFaceSort();*/
+						rc[cp][i] = chunkPart;
+					}
+					it = needsReRendering.erase(it);
+					//renderChunkMap.insert(pos);
 				}
-				renderChunkMap.insert(needsReRendering[l]);
+				else
+				{
+					it++;
+				}
 			}
-			else
-			{
-				//Its not fully loaded yet
-			}
-		}
 
 		//m.render();
-		for (int i = 0; i < rc.size(); i++)
+		for (auto & lc : rc)
 		{
-			glm::mat4 model(1);
+			for (int i = 0; i < 8; i++)
+			{
+				//glm::mat4 model(1);
 
-			BlockPos position = rc[i]->getPosition();
+				BlockPos position = lc.second[i]->getPosition();
 
-			model = glm::translate(model, glm::vec3(position.x, position.y, position.z));
-			shader.setMatrix4("model", glm::value_ptr(model));
-			if(rc[i]->hasLayer(renderParams.layer))
-			rc[i]->render(renderParams, 0.0f);
+				//model = glm::translate(model, glm::vec3(position.x, position.y, position.z));
+
+				//glm::mat4 mv = model * view;
+
+
+				//
+				lc.second[i]->updateFaceSortState(Vec3(c.cameraPos.x, c.cameraPos.y, c.cameraPos.z));//
+				if (lc.second[i]->isFaceSortDirty())
+				{
+					lc.second[i]->startFaceSort(make_unique<RenderChunkSorter>());
+					lc.second[i]->faceSort();
+					lc.second[i]->endFaceSort();
+				}
+				
+				chunkMaterial->myShader->setVector4("CHUNK_ORIGIN_AND_SCALE", glm::vec4(position.x, position.y, position.z, 1));
+				//shader.setMatrix4("model", glm::value_ptr(model));
+				if (lc.second[i]->hasLayer(renderParams.layer))
+					lc.second[i]->render(renderParams, currentFrame);
+			}
 		}
 
 

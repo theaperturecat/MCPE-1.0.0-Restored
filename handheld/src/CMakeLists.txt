@@ -4,6 +4,7 @@ project(minecraftpe)
 
 option(ISPUB "Is public build?" 0)
 option(DEDICATED_SERVER "Is dedicated server?" 0)#Really all this means now is whether to compile client/renderer lol
+option(TEST_THREADING "Thread test build" 0)#Really all this means now is whether to compile client/renderer lol
 set(COMPILE_PLATFORM "WINDOWS" CACHE STRING "Target PLATFORM (WINDOWS/ANDROID/IOS)")
 set(USEGUI 1)
 
@@ -46,6 +47,11 @@ target_compile_definitions(minecraftpe
 )
 endif()
 
+if(TEST_THREADING)
+target_compile_definitions(minecraftpe
+PRIVATE UNSTABLE_THREADING=1
+)
+endif()
 
 
 if(DEDICATED_SERVER)
@@ -92,10 +98,8 @@ odbccp32
 target_sources(minecraftpe
 PRIVATE
 ../src-client/win/renderer.cpp
-../src-client/win/shader.cpp
 ../src-client/win/main.cpp
 PUBLIC
-../src-client/win/shader.h
 ../src-client/win/main_win32.h
 )
 
@@ -518,7 +522,6 @@ PUBLIC
 #common/appplatformlistener.h
 common/common_header.h
 common/CommonTypes.h
-common/Dungeons.h
 common/entityuniqueid.h
 common/SharedConstants.h
 common/GameVersion.h
@@ -828,6 +831,7 @@ common/world/level/block/WoolCarpetBlock.h
 common/world/level/block/WorkbenchBlock.h
 common/world/level/block/entity/BlockEntity.h
 common/world/level/block/entity/BlockEntityRendererId.h
+common/world/level/block/entity/StructureBlockEntity.h
 common/world/level/chunk/ChunkRefCount.h
 common/world/level/chunk/ChunkSource.h
 common/world/level/chunk/ChunkState.h
@@ -1026,6 +1030,7 @@ common/client/renderer/chunks/RenderChunkSorter.cpp
 common/client/renderer/chunks/VisibilityExtimator.cpp
 common/client/renderer/chunks/VisibilityNode.cpp
 common/client/renderer/renderer/Tessellator.cpp
+common/client/renderer/renderer/RenderMaterialGroup.cpp
 common/client/renderer/texture/TextureAtlas.cpp
 common/client/renderer/texture/TextureAtlasItem.cpp
 common/client/renderer/texture/TextureAtlasTile.cpp

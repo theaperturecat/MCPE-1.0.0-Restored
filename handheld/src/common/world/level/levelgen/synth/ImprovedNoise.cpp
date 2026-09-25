@@ -3,7 +3,7 @@
 *   (c) Microsoft. All rights reserved.                 *
 *********************************************************/
 
-#include "Dungeons.h"
+#include "common_header.h"
 
 #include "world/level/levelgen/synth/ImprovedNoise.h"
 #include "util/Random.h"

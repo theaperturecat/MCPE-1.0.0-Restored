@@ -22,7 +22,7 @@ namespace mce
 			group = nullptr;
 			//z = "";
 		}
-		MaterialPtr(RenderMaterialGroup& g, ResourceLocation& llll);
+		MaterialPtr(RenderMaterialGroup& g, const std::string& llll);
 		MaterialPtr(MaterialPtr& mm)
 		{
 			//z = "";
@@ -34,7 +34,7 @@ namespace mce
 		}
 		void onGroupReloaded();
 		static mce::MaterialPtr const NONE;
-		RenderMaterial const* operator->(void)const
+		RenderMaterial const* operator->(void) const
 		{
 			return matptr;
 		}
@@ -43,7 +43,7 @@ namespace mce
 		MaterialPtr& _move(MaterialPtr&& n);
 		RenderMaterialGroup* group;
 		RenderMaterial* matptr;
-		ResourceLocation lll;
+		std::string lll;
 		//std::string z;
 	};
 };

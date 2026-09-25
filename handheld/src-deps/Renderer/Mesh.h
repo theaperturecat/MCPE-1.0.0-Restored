@@ -32,6 +32,8 @@ namespace mce
 		unsigned int VBO = -1;
 		unsigned int EBO = -1;
 
+		IndexBufferUsageMode useMode = IndexBufferUsageMode::Normal;
+
 		void _move(Mesh& other);
 		Mesh& operator=(Mesh&& lll);
 
@@ -74,9 +76,9 @@ namespace mce
 
 		void render(const mce::MaterialPtr& mat, const mce::TexturePtr&, const mce::TexturePtr&, const mce::TexturePtr&, int, int);
 
-		void setIndexBufferUsageMode(IndexBufferUsageMode)
+		void setIndexBufferUsageMode(IndexBufferUsageMode _useMode)
 		{
-
+			useMode = _useMode;
 		}
 
 		void loadIndexBuffer(uint32_t _indexSize, void const* data, unsigned int count);

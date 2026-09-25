@@ -3,7 +3,7 @@
 *   (c) Microsoft. All rights reserved.                 *
 *********************************************************/
 
-#include "Dungeons.h"
+#include "common_header.h"
 
 #include "world/level/LevelSettings.h"
 #include "world/level/storage/LevelData.h"

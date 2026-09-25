@@ -52,7 +52,7 @@ namespace mce
 		void createTexture(RenderContext&, TextureDescription&);
 
 		void deleteTexture();
-		unsigned int texid;
+		unsigned int texid = -1;
 		//TextureFormat frmt;
 	};
 

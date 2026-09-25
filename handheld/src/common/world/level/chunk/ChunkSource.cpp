@@ -2,7 +2,7 @@
 *   (c) Mojang. All rights reserved                     *
 *   (c) Microsoft. All rights reserved.                 *
 *********************************************************/
-#include "Dungeons.h"
+#include "common_header.h"
 
 #include "world/level/chunk/ChunkSource.h"
 
@@ -260,13 +260,15 @@ void ChunkSource::_startPostProcessing(LevelChunk& lc) {
 #ifdef TAC_THREADED_CHUNK_GEN
  	WorkerPool::getFor(WorkerRole::Streaming).queue(
  		[this, &lc, chunks, succeeded] () {
- 
+			if (lc.getPosition() == ChunkPos(1, 1)) printf("Yes this chunk is processing\n");
  			ScopedProfile("postProcess");
  			if (lc.tryChangeState(ChunkState::Generated, ChunkState::PostProcessing)) {
  				if (lc.getGenerator()->postProcess(*chunks) == false) {
+					if (lc.getPosition() == ChunkPos(1, 1)) printf("No this chunk is failing processing\n");
  					lc.changeState(ChunkState::PostProcessing, ChunkState::Generated);	//go back and try again
  					return false;
  				}
+				if (lc.getPosition() == ChunkPos(1, 1)) printf("Yes this chunk is loaded\n");
  
  				lc.changeState(ChunkState::PostProcessing, ChunkState::Loaded);
  				*succeeded = true;

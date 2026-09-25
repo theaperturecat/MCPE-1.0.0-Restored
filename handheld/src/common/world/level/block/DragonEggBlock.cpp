@@ -3,7 +3,7 @@
 *  (c) Microsoft. All rights reserved.                  *
 *********************************************************/
 
-#include "Dungeons.h"
+#include "common_header.h"
 
 #include "world/level/block/DragonEggBlock.h"
 #include "world/level/material/Material.h"

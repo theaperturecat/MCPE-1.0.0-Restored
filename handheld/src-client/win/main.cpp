@@ -22,6 +22,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 #include "stb_image.h"
+#include <platform/threading/WorkerPool.h>
 
 //not needed since dbstorage is working now
 /*
@@ -394,19 +395,22 @@ bool mcmd_loadchunks(CCTX* commandctx, std::vector<std::string>& options, std::v
 {
 	ChunkPos cp(atoi(params[0].c_str()), atoi(params[1].c_str()));
 	ChunkPos cp2(cp.x + 1, cp.z + 1);
-
-	//bool forceGenerate = false;
-	bool profile = false;
-	for (int i = 0; i < options.size(); i++)
-	{
-		//forceGenerate |= (strlower(options[i]) == "forcegenerate");
-		profile |= (strlower(options[i]) == "profile");
-	}
-
 	if (params.size() >= 4)
 	{
 		cp2 = ChunkPos(atoi(params[2].c_str()), atoi(params[3].c_str()));
 	}
+
+	//bool forceGenerate = false;
+	bool profile = false;
+	bool noWait = false;
+	for (int i = 0; i < options.size(); i++)
+	{
+		//forceGenerate |= (strlower(options[i]) == "forcegenerate");
+		profile |= (strlower(options[i]) == "profile");
+		noWait |= (strlower(options[i]) == "nowait");
+	}
+
+
 	if(profile)
 	ScopedProfilee::beginreport();
 	for (int i = cp.x; i < cp2.x; i++)
@@ -894,6 +898,16 @@ extern mce::TextureGroup texgroup;
 
 void main()
 {
+#ifdef UNSTABLE_THREADING
+	WorkerPool::workers.resize((unsigned int)WorkerRole::NumWorkerRoles);
+
+	for (int i = 0; i < 8; i++)
+		WorkerPool::workers[0].push_back(new BackgroundWorker());
+	for (int i = 0; i < 1; i++)
+		WorkerPool::workers[1].push_back(new BackgroundWorker());
+	for (int i = 0; i < 1; i++)
+		WorkerPool::workers[2].push_back(new BackgroundWorker());
+#endif
 	DebugLog::createLog("./restore/");
 	LOGI("Minecraft restoration is running\n");
 
@@ -930,4 +944,6 @@ void main()
     //while (true)
     //    std::this_thread::sleep_for(std::chrono::seconds(1));
 }
-
+#ifdef UNSTABLE_THREADING
+std::vector<std::vector<BackgroundWorker*>> WorkerPool::workers;
+#endif

@@ -3,7 +3,7 @@
 *  (c) Microsoft. All rights reserved.                  *
 *********************************************************/
 
-#include "Dungeons.h"
+#include "common_header.h"
 
 #include "util/GzipUtils.h"
 #include "Core/Utility/utf8proc.h"
@@ -124,9 +124,11 @@ namespace GzipUtil
 		fileData.reserve(512);
 
 		// Read the gzip file into a string to prepare for decompression
-		// TODO: rherlitz fix
-// 		std::string readData = AppPlatform::singleton().readAssetFile(filename);
+#ifdef TAC_COMPILE
+ 		std::string readData = AppPlatform::singleton().readAssetFile(filename);
+#else
 		std::string readData = "";
+#endif
 		if (readData.empty()) {
 			return false;
 		}

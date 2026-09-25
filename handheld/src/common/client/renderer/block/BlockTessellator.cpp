@@ -2,7 +2,7 @@
 *  (c) Mojang.    All rights reserved.                  *
 *  (c) Microsoft. All rights reserved.                  *
 *********************************************************/
-#include "Dungeons.h"
+#include "common_header.h"
 
 #include "client/renderer/block/BlockTessellator.h"
 #include "client/renderer/renderer/Tessellator.h"
@@ -57,6 +57,8 @@
 // Unreal
 #include "Components/PointLightComponent.h"
 #endif
+
+#define DISABLEN
 
 Vec2 toUV(BrightnessPair coords) {
 	return{ coords.block / 16.f, coords.sky / 16.f };
@@ -944,6 +946,9 @@ bool BlockTessellator::tessellateCrossPolyInWorld(const Block& block, const Bloc
 }
 
 bool BlockTessellator::tessellateDoublePlantInWorld(const DoublePlantBlock& block, const BlockPos& p, DataID data, bool preferPoly, bool renderBothSides) {
+#ifdef DISABLEN
+	return false;
+#endif
 	static const FacingID SUNFLOWER_ADDITIONAL = Facing::NORTH;
 	static const FacingID PLANT_TOP = Facing::UP;
 	static const FacingID PLANT_BOTTOM = Facing::DOWN;
@@ -1256,6 +1261,9 @@ void BlockTessellator::tessellateCrossTexture(const TextureUVCoordinateSet& tex,
 }
 
 void BlockTessellator::tessellateCrossPolyTexture(const TextureUVCoordinateSet& tex, const Vec3& pos, bool renderBothSides, const Block& block) {
+#ifdef DISABLEN
+	return;
+#endif
 	BlockTextureTessellator::render(mTessellator, pos, tex, true, tex.pixelWidth(), 45, Vec3::ZERO, renderBothSides, mUseNormals);
 	BlockTextureTessellator::render(mTessellator, pos, tex, true, tex.pixelWidth(), 135, Vec3::ZERO, renderBothSides, mUseNormals);
 }
@@ -2085,6 +2093,9 @@ bool BlockTessellator::tessellateFenceGateInWorld(const FenceGateBlock& block, c
 }
 
 bool BlockTessellator::tessellateBedInWorld(const Block& block, const BlockPos& p, DataID data) {
+#ifdef DISABLEN
+	return false;
+#endif
 	int direction = Block::mBed->getBlockState(BlockState::Direction).get<int>(data);
 	bool isHead = BedBlock::isHeadPiece(data);
 
@@ -2303,6 +2314,9 @@ bool BlockTessellator::tessellateVineInWorld(const Block& block, const BlockPos&
 }
 
 bool BlockTessellator::tessellateCocoaInWorld(const CocoaBlock& block, const BlockPos& p, DataID data) {
+#ifdef DISABLEN
+	return false;
+#endif
 	mTessellator.color(Color::WHITE);
 	_tex1(toUV(getLightColor(p)));
 

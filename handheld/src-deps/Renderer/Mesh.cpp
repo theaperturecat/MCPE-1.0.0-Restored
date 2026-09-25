@@ -1,6 +1,7 @@
 #include "Mesh.h"
 #include "TexturePtr.h"
 #include "hal/interface/RenderContextImmediate.h"
+#include "materialptr.h"
 #include <glad/glad.h>
 namespace mce
 {
@@ -18,7 +19,7 @@ namespace mce
     int fieldTypes[] =
     {
         GL_FLOAT,
-        GL_UNSIGNED_INT,
+        GL_UNSIGNED_BYTE,
         GL_UNSIGNED_INT,
         GL_UNSIGNED_SHORT,
         GL_UNSIGNED_SHORT,
@@ -38,7 +39,7 @@ namespace mce
     bool doNormalize[] =
     {
         false,
-        false,
+        true,
         false,
         true,//we want our uvs to be converted back to 0-1
         true,
@@ -48,11 +49,21 @@ namespace mce
     int fieldAmounts[] =
     {
         3,
+        4,
         1,
-        1,
         2,
         2,
         2,
+    };
+
+    const char* vertexFormatNames[] =
+    {
+        "POSITION",
+        "COLOR",
+        "NORMAL",
+        "TEXCOORD_0",
+        "TEXCOORD_1",
+        "TEXCOORD_2",
     };
 
     VertexFormat VertexFormat::EMPTY;
@@ -119,9 +130,10 @@ namespace mce
         glBindVertexArray(VAO);
        
 
-        if (indexCount * indexSize > 0)
+        if (useMode == IndexBufferUsageMode::Normal && indexCount * indexSize > 0)
         {
-            glDrawElements(primitiveConversions[(int)mode], indexCount, indexSize == 4 ? GL_UNSIGNED_INT : GL_UNSIGNED_SHORT, 0);
+            int realMode = mode == PrimitiveMode::QuadList ? GL_TRIANGLES : primitiveConversions[(int)mode];
+            glDrawElements(realMode, indexCount, indexSize == 4 ? GL_UNSIGNED_INT : GL_UNSIGNED_SHORT, 0);
         }
         else
         {
@@ -164,23 +176,61 @@ namespace mce
 
     void Mesh::render(const mce::MaterialPtr& mat)
     {
+        mat->activate();
         render();
     }
 
-    void Mesh::render(const mce::MaterialPtr& mat, const mce::TexturePtr& text)
+    void Mesh::render(const mce::MaterialPtr& mat, const mce::TexturePtr& text1)
     {
-        text->bindTexture(RenderContextImmediate::get(), 0, 0);
-        render();
+        if ((*text1) != nullptr)
+        text1->bindTexture(RenderContextImmediate::get(), 0, 0);
+        render(mat);
     }
 
-    void Mesh::render(const mce::MaterialPtr& mat, const mce::TexturePtr& text, const mce::TexturePtr&)
+    void Mesh::render(const mce::MaterialPtr& mat, const mce::TexturePtr& text, const mce::TexturePtr& text2)
     {
+        if ((*text2) != nullptr)
+        text2->bindTexture(RenderContextImmediate::get(), 1, 0);
         render(mat,text);
     }
 
-    void Mesh::render(const mce::MaterialPtr& mat, const mce::TexturePtr& text, const mce::TexturePtr&, const mce::TexturePtr&, int, int)
+    void Mesh::render(const mce::MaterialPtr& mat, const mce::TexturePtr& text1, const mce::TexturePtr&text2, const mce::TexturePtr&text3, int start, int count)
     {
-        render(mat, text);
+        if((*text3) != nullptr)
+        text3->bindTexture(RenderContextImmediate::get(), 2, 0);
+        if ((*text2) != nullptr)
+        text2->bindTexture(RenderContextImmediate::get(), 1, 0);
+        if ((*text1) != nullptr)
+        text1->bindTexture(RenderContextImmediate::get(), 0, 0);
+        mat->activate();
+        if (VBO == -1)
+            upload();
+
+        glBindVertexArray(VAO);
+
+
+        if (useMode == IndexBufferUsageMode::Normal && indexCount * indexSize > 0)
+        {
+            //printf("start %i count %i\n", start, count);
+            int realMode = mode == PrimitiveMode::QuadList ? GL_TRIANGLES : primitiveConversions[(int)mode];//hack because for some reason sorting changes this to tris not gl_quad (maybe non-sorted wasnt updated from immediate mode gl?)
+            glDrawElements(realMode, count, indexSize == 4 ? GL_UNSIGNED_INT : GL_UNSIGNED_SHORT, (void *)(start*indexSize));//apparently this is in bytes not in units of indices
+        }
+        else
+        {
+            GLenum err;
+            while ((err = glGetError()) != GL_NO_ERROR)
+                printf("Before draw: %x\n", err);
+
+            
+
+            glDrawArrays(primitiveConversions[(int)mode], 0, vertexCount);
+
+            while ((err = glGetError()) != GL_NO_ERROR)
+                printf("After draw: %x\n", err);
+
+            // glDrawArrays(primitiveConversions[(int)mode], 0, vertexCount);
+        }
+        glBindVertexArray(0);
     }
 
     void Mesh::reset()

@@ -1,4 +1,4 @@
-#include "Dungeons.h"
+#include "common_header.h"
 
 #include "world/entity/EntityClassTree.h"
 #include "world/entity/Entity.h"
@@ -65,9 +65,7 @@ bool EntityClassTree::isTypeInstanceOf(EntityType type, EntityType testFor) {
 }
 
 bool EntityClassTree::isInstanceOf(const Entity& inEntity, EntityType type) {
-	// TODO: rherlitz
-	//return EntityClassTree::isTypeInstanceOf(inEntity.getEntityTypeId(), type);
-	return true;
+	return EntityClassTree::isTypeInstanceOf(inEntity.getEntityTypeId(), type);
 }
 
 // D5: contains is the group, could be a separate enum

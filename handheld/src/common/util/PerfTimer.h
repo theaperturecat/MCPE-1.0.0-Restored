@@ -13,15 +13,19 @@
 class ScopedProfilee
 {
 public:
+    static std::mutex profilemutex;
     ScopedProfilee(const char* name)
         : m_name(name),
         m_start(std::chrono::high_resolution_clock::now())
     {
+        std::lock_guard lg(profilemutex);
         activeProfiles.push_back(0);
+
     }
 
     ~ScopedProfilee()
     {
+        std::lock_guard lg(profilemutex);
         auto end = std::chrono::high_resolution_clock::now();
 
         double ms = std::chrono::duration<double, std::milli>(
@@ -57,6 +61,7 @@ public:
 
     static void beginreport()
     {
+        std::lock_guard lg(profilemutex);
         for (auto& t : timings)
         {
             t.second.calls = 0;
@@ -68,6 +73,7 @@ public:
 
     static void report()
     {
+        std::lock_guard lg(profilemutex);
         std::vector<std::pair<std::string,Timing>> sorted;
 
         auto endReport = std::chrono::high_resolution_clock::now();
@@ -95,6 +101,7 @@ public:
             printf("[PROFILE] Task %s had %i calls and took %f/%.2f seconds inclusive, %f/%.2f seconds exclusive\n",t.first.c_str(), (int)t.second.calls, t.second.inclusiveTime / 1000.0, ms / 1000.0, t.second.exclusiveTime / 1000.0, ms / 1000.0);
         }
     }
+    
     static std::chrono::high_resolution_clock::time_point startReport;
     static std::unordered_map<std::string, Timing> timings;
     static std::vector<double> activeProfiles;

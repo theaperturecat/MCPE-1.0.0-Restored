@@ -2,7 +2,7 @@
 *   (c) Mojang. All rights reserved                     *
 *   (c) Microsoft. All rights reserved.                 *
 *********************************************************/
-#include "Dungeons.h"
+#include "common_header.h"
 
 #include "client/game/ExternalServersFile.h"
 //#include "network/NetworkIdentifier.h"

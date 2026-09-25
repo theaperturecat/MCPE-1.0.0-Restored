@@ -17,7 +17,7 @@ namespace mce
 		return *this;
 	}
 
-	MaterialPtr::MaterialPtr(RenderMaterialGroup& g, ResourceLocation& llll)
+	MaterialPtr::MaterialPtr(RenderMaterialGroup& g, const std::string& llll)
 	{
 		group = &g;
 		matptr = nullptr;
@@ -26,12 +26,12 @@ namespace mce
 
 		g._addRef(*this);
 
-		matptr = group->getMaterial(lll);
+		matptr = group->_getMaterialPtr(lll);
 	}
 
 	void MaterialPtr::onGroupReloaded()
 	{
-		matptr = group->getMaterial(lll);
+		matptr = group->_getMaterialPtr(lll);
 	}
 
 	void MaterialPtr::_deref()

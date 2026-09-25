@@ -2,7 +2,7 @@
 *   (c) Mojang. All rights reserved                     *
 *   (c) Microsoft. All rights reserved.                 *
 *********************************************************/
-#include "Dungeons.h"
+#include "common_header.h"
 
 #include "world/level/storage/DBChunkStorage.h"
 
@@ -158,11 +158,6 @@ void DBChunkStorage::loadChunk(LevelChunk& lc, bool forceImmediateReplacementDat
 				lc.changeState(
 					ChunkState::Generating,
 					lc.needsUpgradeFix() ? ChunkState::Generated : ChunkState::Loaded);
-
-				// TODO: rherlitz fix
-				//lc.changeState(
-				//	ChunkState::Unloaded,
-				//	lc.needsUpgradeFix() ? ChunkState::Generated : ChunkState::Loaded);
 
 				lc._changeTerrainDataState(
 					ChunkTerrainDataState::NoData,

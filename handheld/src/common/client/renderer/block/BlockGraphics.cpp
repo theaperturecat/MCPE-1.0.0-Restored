@@ -2,7 +2,7 @@
 *  (c) Mojang.    All rights reserved.                  *
 *  (c) Microsoft. All rights reserved.                  *
 *********************************************************/
-#include "Dungeons.h"
+#include "common_header.h"
 
 #include "client/renderer/block/BlockGraphics.h"
 #include "world/level/block/Block.h"
@@ -310,10 +310,8 @@ void BlockGraphics::initBlocks() {
 	Json::Reader reader;
  	std::string fileContent;
 
-	// TODO: rherlitz
+
  	Resource::load(ResourceLocation("blocks.json"), fileContent);
-	//std::string path = "Content/data/resourcepacks/vanilla/blocks.json";//theaperturecat fix
-	//std::ifstream fileContent(path);
 	JSONReadVerifier::verifyRead("blocks.json", reader, reader.parse(fileContent, json));
 
 	registerBlockGraphics(json, "air");

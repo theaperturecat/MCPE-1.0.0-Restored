@@ -18,7 +18,7 @@
 // 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
 
-#include "Dungeons.h"
+#include "common_header.h"
 
 #include "world/level/levelgen/structure/StructureTemplateHelpers.h"
 #include "world/level/levelgen/structure/StructureTemplate.h"

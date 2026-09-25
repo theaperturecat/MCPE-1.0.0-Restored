@@ -3,7 +3,7 @@
 *   (c) Microsoft. All rights reserved.                   *
 *********************************************************/
 
-#include "Dungeons.h"
+#include "common_header.h"
 
 #include "client/renderer/renderer/Tessellator.h"
 
@@ -222,8 +222,8 @@ void Tessellator::color(byte r, byte g, byte b, byte a) {
 		return;
 	}
 
-// 	mColor = (a << 24) | (b << 16) | (g << 8) | (r);
-	mColor = (a << 24) | (r << 16) | (g << 8) | (b);
+ 	mColor = (a << 24) | (b << 16) | (g << 8) | (r);
+	//mColor = (a << 24) | (r << 16) | (g << 8) | (b);
 
 	if (!mCurrentPointers) {
 		mVertexFormat.enableField(mce::VertexField::Color);

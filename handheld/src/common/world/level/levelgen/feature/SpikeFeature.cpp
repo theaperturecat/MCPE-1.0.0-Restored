@@ -2,7 +2,7 @@
 *   (c) Mojang. All rights reserved                     *
 *   (c) Microsoft. All rights reserved.                 *
 *********************************************************/
-#include "Dungeons.h"
+#include "common_header.h"
 
 #include "world/level/levelgen/feature/SpikeFeature.h"
 
@@ -112,7 +112,6 @@ bool SpikeFeature::placeManually(BlockSource& region, const BlockPos& pos, Rando
 }
 
 void SpikeFeature::postProcessMobsAt(BlockSource& region, const BlockPos& pos, Random& random) const {
-	// TODO: rherlitz
 #ifdef TAC_COMPILE
 	Unique<Entity> newEntity= EntityFactory::createSpawnedEntity(
 		EntityType::EnderCrystal, 

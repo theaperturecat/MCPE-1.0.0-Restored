@@ -1,4 +1,4 @@
-#include "Dungeons.h"
+#include "common_header.h"
 
 #include "world/level/levelgen/structure/NetherBridgeFeature.h"
 #include "world/level/levelgen/structure/NetherBridgePieces.h"

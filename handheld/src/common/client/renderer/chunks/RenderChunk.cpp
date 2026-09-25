@@ -2,7 +2,7 @@
 *   (c) Mojang. All rights reserved                     *
 *   (c) Microsoft. All rights reserved.                 *
 *********************************************************/
-#include "Dungeons.h"
+#include "common_header.h"
 
 #include "client/renderer/chunks/RenderChunk.h"
 #include "client/renderer/renderer/Tessellator.h"
@@ -461,6 +461,16 @@ void RenderChunk::sortFaces() {
 
 		}
 		else {
+			//theaperturecat
+			/*faceTypesToRender[numFaceTypesToRender++] = Facing::EAST;
+			faceTypesToRender[numFaceTypesToRender++] = Facing::WEST;
+			faceTypesToRender[numFaceTypesToRender++] = Facing::UP;
+			faceTypesToRender[numFaceTypesToRender++] = Facing::DOWN;
+			faceTypesToRender[numFaceTypesToRender++] = Facing::SOUTH;
+			faceTypesToRender[numFaceTypesToRender++] = Facing::NORTH;*/
+			
+			
+			
 			// include front faces
 			if (mLastSortCameraDelta.x <= 0)	faceTypesToRender[numFaceTypesToRender++] = Facing::EAST;
 			if (mLastSortCameraDelta.x >= 0)	faceTypesToRender[numFaceTypesToRender++] = Facing::WEST;

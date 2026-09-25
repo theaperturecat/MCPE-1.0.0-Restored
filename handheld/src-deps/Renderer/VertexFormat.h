@@ -14,6 +14,8 @@ namespace mce
 		NumVertexFields,
 	};
 
+	const char* vertexFormatNames[];
+
 	int fieldSizes[];
 
 	class VertexFormat
