@@ -134,7 +134,7 @@ namespace mce
 
 	void RenderMaterial::activate() const
 	{
-		/*if (depthWrite)
+		if (depthWrite)
 		{
 			glDepthMask(GL_TRUE);
 		}
@@ -145,11 +145,11 @@ namespace mce
 		glDepthFunc(depthFunc);
 		if (blending)
 		{
-			//glEnable(GL_BLEND);
+			glEnable(GL_BLEND);
 		}
 		else
 		{
-			//glDisable(GL_BLEND);
+			glDisable(GL_BLEND);
 		}
 
 		if (cullMode == CullMode::DISABLED)
@@ -159,8 +159,8 @@ namespace mce
 		else
 		{
 			glEnable(GL_CULL_FACE);
-			glFrontFace(cullMode == CullMode::NORMAL ? GL_CW : GL_CCW);
-		}*/
+			glFrontFace(cullMode == CullMode::NORMAL ? GL_CCW : GL_CW);
+		}
 
 		myShader->activate();
 	}

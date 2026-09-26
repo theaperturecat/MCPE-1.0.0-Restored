@@ -37,7 +37,7 @@ namespace mce
             if (!success)
             {
                 char infoLog[2048];
-                glGetShaderInfoLog(shaderid, 2048, NULL, infoLog);
+                glGetProgramInfoLog(shaderid, 2048, NULL, infoLog);
                 LOGE("Shader link error \n%s\n", infoLog);
                 exit(0);
             }
@@ -145,6 +145,11 @@ namespace mce
         hhh.push_back("#define POS4 vec4\n#define POS3 vec3\n#define MAT4 mat4\n");
 
         hhh.push_back(output);
+
+        for (auto& h : hhh)
+        {
+            cc.push_back(h.c_str());
+        }
 
         /*static int rwr = 0;
 
