@@ -10,6 +10,7 @@ On March 1, 2026, a major Minecraft source code leak which included Minecraft Le
 - The full chunk generation code
 - Exporting areas of the world as pictures
 - Basic textured rendering of chunks (can be seen above)
+- Transparent water (buggy still)
 - Loading real Minecraft PE shaders+materials (incomplete but works)
 - Unstable multithreading (define TEST_THREADING when building a vs solution with cmake)
 

@@ -1487,40 +1487,39 @@ bool BlockTessellator::tessellateLiquidInWorld(const LiquidBlock& block, const B
 		float v00, v01, v10, v11;
 
 		if (angle < -999) {
-			//u00 = tex._u0;
-			//v00 = tex._v0;
-			u00 = 0;
-			v00 = 0;
-			u01 = u00;
-			//v01 = tex._v1;	// tex.getV(SharedConstants.WORLD_RESOLUTION);
-			//u10 = tex._u1;	// tex.getU(SharedConstants.WORLD_RESOLUTION);
-			v01 = 1;	// tex.getV(SharedConstants.WORLD_RESOLUTION);
-			u10 = 1;	// tex.getU(SharedConstants.WORLD_RESOLUTION);
-			v10 = v01;
-			u11 = u10;
-			v11 = v00;
+			u00 = tex._u0;
+			v00 = tex._v0;
+
+			u01 = tex._u0;
+			v01 = tex._v1;
+
+			u10 = tex._u1;
+			v10 = tex._v1;
+
+			u11 = tex._u1;
+			v11 = tex._v0;
 		}
 		else {
 			const float s = Math::sin(angle) * .5f;
 			const float c = Math::cos(angle) * .5f;
 
-			//u00 = tex.offsetWidth(1 - c - s);//tex.getU(cc + (-c - s) * SharedConstants.WORLD_RESOLUTION);
-			//v00 = tex.offsetHeight(1 - c + s);	//tex.getV(cc + (-c + s) * SharedConstants.WORLD_RESOLUTION);
-			//u01 = tex.offsetWidth(1 - c + s);//tex.getU(cc + (-c + s) * SharedConstants.WORLD_RESOLUTION);
-			//v01 = tex.offsetHeight(1 + c + s);	//tex.getV(cc + (+c + s) * SharedConstants.WORLD_RESOLUTION);
-			//u10 = tex.offsetWidth(1 + c + s);//tex.getU(cc + (+c + s) * SharedConstants.WORLD_RESOLUTION);
-			//v10 = tex.offsetHeight(1 + c - s);	//tex.getV(cc + (+c - s) * SharedConstants.WORLD_RESOLUTION);
-			//u11 = tex.offsetWidth(1 + c - s);//tex.getU(cc + (+c - s) * SharedConstants.WORLD_RESOLUTION);
-			//v11 = tex.offsetHeight(1 - c - s);	//tex.getV(cc + (-c - s) * SharedConstants.WORLD_RESOLUTION);
+			u00 = tex.offsetWidth(1 - c - s);//tex.getU(cc + (-c - s) * SharedConstants.WORLD_RESOLUTION);
+			v00 = tex.offsetHeight(1 - c + s);	//tex.getV(cc + (-c + s) * SharedConstants.WORLD_RESOLUTION);
+			u01 = tex.offsetWidth(1 - c + s);//tex.getU(cc + (-c + s) * SharedConstants.WORLD_RESOLUTION);
+			v01 = tex.offsetHeight(1 + c + s);	//tex.getV(cc + (+c + s) * SharedConstants.WORLD_RESOLUTION);
+			u10 = tex.offsetWidth(1 + c + s);//tex.getU(cc + (+c + s) * SharedConstants.WORLD_RESOLUTION);
+			v10 = tex.offsetHeight(1 + c - s);	//tex.getV(cc + (+c - s) * SharedConstants.WORLD_RESOLUTION);
+			u11 = tex.offsetWidth(1 + c - s);//tex.getU(cc + (+c - s) * SharedConstants.WORLD_RESOLUTION);
+			v11 = tex.offsetHeight(1 - c - s);	//tex.getV(cc + (-c - s) * SharedConstants.WORLD_RESOLUTION);
 
-			u10 = (1 - c - s);//tex.getU(cc + (-c - s) * SharedConstants.WORLD_RESOLUTION);
-			v10 = (1 - c + s);	//tex.getV(cc + (-c + s) * SharedConstants.WORLD_RESOLUTION);
-			u11 = (1 - c + s);//tex.getU(cc + (-c + s) * SharedConstants.WORLD_RESOLUTION);
-			v11 = (1 + c + s);	//tex.getV(cc + (+c + s) * SharedConstants.WORLD_RESOLUTION);
-			u00 = (1 + c + s);//tex.getU(cc + (+c + s) * SharedConstants.WORLD_RESOLUTION);
-			v00 = (1 + c - s);	//tex.getV(cc + (+c - s) * SharedConstants.WORLD_RESOLUTION);
-			u01 = (1 + c - s);//tex.getU(cc + (+c - s) * SharedConstants.WORLD_RESOLUTION);
-			v01 = (1 - c - s);	//tex.getV(cc + (-c - s) * SharedConstants.WORLD_RESOLUTION);
+			//u10 = (1 - c - s);//tex.getU(cc + (-c - s) * SharedConstants.WORLD_RESOLUTION);
+			//v10 = (1 - c + s);	//tex.getV(cc + (-c + s) * SharedConstants.WORLD_RESOLUTION);
+			//u11 = (1 - c + s);//tex.getU(cc + (-c + s) * SharedConstants.WORLD_RESOLUTION);
+			//v11 = (1 + c + s);	//tex.getV(cc + (+c + s) * SharedConstants.WORLD_RESOLUTION);
+			//u00 = (1 + c + s);//tex.getU(cc + (+c + s) * SharedConstants.WORLD_RESOLUTION);
+			//v00 = (1 + c - s);	//tex.getV(cc + (+c - s) * SharedConstants.WORLD_RESOLUTION);
+			//u01 = (1 + c - s);//tex.getU(cc + (+c - s) * SharedConstants.WORLD_RESOLUTION);
+			//v01 = (1 - c - s);	//tex.getV(cc + (-c - s) * SharedConstants.WORLD_RESOLUTION);
 		}
 
 		auto thisblock = _getLightColorForWater(p, { Brightness(11), Brightness(11) });
@@ -1542,23 +1541,23 @@ bool BlockTessellator::tessellateLiquidInWorld(const LiquidBlock& block, const B
 
 		_tex1(br[0]);
 		mTessellator.color(vcolors[0]);
-		//mTessellator.vertexUV(p.x + 0.0f, p.y + h0, p.z + 0.0f, u00, v00);
-		mTessellator.vertexUV(p.x + 0.0f, p.y + h0, p.z + 0.0f, u01, v01);
+		mTessellator.vertexUV(p.x + 0.0f, p.y + h0, p.z + 0.0f, u00, v00);
+		//mTessellator.vertexUV(p.x + 0.0f, p.y + h0, p.z + 0.0f, u01, v01);
 
 		_tex1(br[1]);
 		mTessellator.color(vcolors[1]);
-		//mTessellator.vertexUV(p.x + 0.0f, p.y + h1, p.z + 1.0f, u01, v01);
-		mTessellator.vertexUV(p.x + 0.0f, p.y + h1, p.z + 1.0f, u00, v00);
+		mTessellator.vertexUV(p.x + 0.0f, p.y + h1, p.z + 1.0f, u01, v01);
+		//mTessellator.vertexUV(p.x + 0.0f, p.y + h1, p.z + 1.0f, u00, v00);
 
 		_tex1(br[3]);
 		mTessellator.color(vcolors[3]);
-		//mTessellator.vertexUV(p.x + 1.0f, p.y + h2, p.z + 1.0f, u10, v10);
-		mTessellator.vertexUV(p.x + 1.0f, p.y + h2, p.z + 1.0f, u11, v11);
+		mTessellator.vertexUV(p.x + 1.0f, p.y + h2, p.z + 1.0f, u10, v10);
+		//mTessellator.vertexUV(p.x + 1.0f, p.y + h2, p.z + 1.0f, u11, v11);
 
 		_tex1(br[2]);
 		mTessellator.color(vcolors[2]);
-		//mTessellator.vertexUV(p.x + 1.0f, p.y + h3, p.z + 0.0f, u11, v11);
-		mTessellator.vertexUV(p.x + 1.0f, p.y + h3, p.z + 0.0f, u10, v10);
+		mTessellator.vertexUV(p.x + 1.0f, p.y + h3, p.z + 0.0f, u11, v11);
+		//mTessellator.vertexUV(p.x + 1.0f, p.y + h3, p.z + 0.0f, u10, v10);
 	}
 
 	if(!occluder.occludes(Facing::DOWN)) {
@@ -1621,12 +1620,12 @@ bool BlockTessellator::tessellateLiquidInWorld(const LiquidBlock& block, const B
 			}
 
 			changed = true;
-			//float u0 = tex._u0;
-			//float u1 = tex._u1;
+			float u0 = tex._u0;
+			float u1 = tex._u1;
 
-			//float v01 = tex.offsetHeight((1 - hh0));
-			//float v02 = tex.offsetHeight((1 - hh1));
-			//float v1 = tex.offsetHeight(1);
+			float v01 = tex.offsetHeight((1 - hh0));
+			float v02 = tex.offsetHeight((1 - hh1));
+			float v1 = tex.offsetHeight(1);
 
 			BlockPos n = p.neighbor(face);
 			float fbr = face < 2 ? c2 : c3;
@@ -1636,14 +1635,14 @@ bool BlockTessellator::tessellateLiquidInWorld(const LiquidBlock& block, const B
 			float vo = 0.f;
 
 			mTessellator.color(vcolors[0] * c11 * fbr);
-			//mTessellator.vertexUV(x0, p.y + hh0, z0, u0, v01);
-			//mTessellator.vertexUV(x1, p.y + hh1, z1, u1, v02);
-			//mTessellator.vertexUV(x1, p.y + vo, z1, u1, v1);
-			//mTessellator.vertexUV(x0, p.y + vo, z0, u0, v1);
-			mTessellator.vertexUV(x0, p.y + hh0, z0, 0, 0);
-			mTessellator.vertexUV(x1, p.y + hh1, z1, 1, 0);
-			mTessellator.vertexUV(x1, p.y + vo, z1, 1, 1);
-			mTessellator.vertexUV(x0, p.y + vo, z0, 0, 1);
+			mTessellator.vertexUV(x0, p.y + hh0, z0, u0, v01);
+			mTessellator.vertexUV(x1, p.y + hh1, z1, u1, v02);
+			mTessellator.vertexUV(x1, p.y + vo, z1, u1, v1);
+			mTessellator.vertexUV(x0, p.y + vo, z0, u0, v1);
+			//mTessellator.vertexUV(x0, p.y + hh0, z0, 0, 0);
+			//mTessellator.vertexUV(x1, p.y + hh1, z1, 1, 0);
+			//mTessellator.vertexUV(x1, p.y + vo, z1, 1, 1);
+			//mTessellator.vertexUV(x0, p.y + vo, z0, 0, 1);
 		}
 	}
 

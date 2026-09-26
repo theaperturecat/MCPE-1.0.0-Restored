@@ -154,7 +154,7 @@ public:
 	BlockSource* mRegion;//commandContext.dim->getChunkSource()
 	Level* mLevel;
 	Vec3 mPosDelta;
-	float mMaxAutoStep = 0.2f;
+	float mMaxAutoStep = 0.0f;
 	bool mCollidableMobNear = false;
 	float mLastPenetration = 0;
 	bool mHorizontalCollision = false;
@@ -168,7 +168,7 @@ public:
 	AABB mBB;
 	std::vector<AABB> mSubBBs;
 	//Vec2 mBBDim = { 0.6f, 1.8f }; // *** Def ***
-	float mHeightOffset = 2;
+	float mHeightOffset = 1.7;
 	Vec3 mSlideOffset = Vec3(0,0,0);
 	bool mNoPhysics = false;
 
@@ -183,7 +183,7 @@ public:
 	{
 		mRegion = &dim->getBlockSourceDEPRECATEDUSEPLAYERREGIONINSTEAD();
 		mLevel = level;
-		mBB.set(-0.5,98,-0.5,0.5,100,0.5);
+		mBB.set(-0.4,98,-0.4,0.4,99.8,0.4);
 	}
 
 	bool isSneaking()
@@ -275,7 +275,7 @@ public:
 
 		if (mOnGround && glinput.NewKeyDown(GLFW_KEY_SPACE))
 		{
-			mPosDelta.y = 1;
+			mPosDelta.y = 0.9;
 		}
 
 		glm::vec3 mmPos(0, 0, 0);//bps
@@ -815,22 +815,35 @@ void renderThreadStuff()
 	};
 
 	mce::MaterialPtr chunkMaterial = mce::RenderMaterialGroup::switchable.getMaterial("terrain_opaque");
+	mce::MaterialPtr chunk2Material = mce::RenderMaterialGroup::switchable.getMaterial("terrain_water");
+	mce::MaterialPtr chunk3Material = mce::RenderMaterialGroup::switchable.getMaterial("terrain_blend");
 	
+	std::vector<mce::MaterialPtr*> mptrs = { &chunkMaterial, &chunk2Material, &chunk3Material };
+
 	glm::mat4 projection = glm::perspective(glm::radians(85.0f),
 		(float)screenx / (float)screeny,
 		0.1f, 1000.0f);
 
-	chunkMaterial->myShader->setMatrix4("PROJ", glm::value_ptr(projection));
 
-	chunkMaterial->myShader->setInt("TEXTURE_0", 0);
-	chunkMaterial->myShader->setFloat("FAR_CHUNKS_DISTANCE", 100);
-	chunkMaterial->myShader->setFloat("RENDER_DISTANCE", 100);
+
+	for (auto sl : mptrs)
+	{
+		(*sl)->myShader->setMatrix4("PROJ", glm::value_ptr(projection));
+		(*sl)->myShader->setInt("TEXTURE_0", 0);
+		(*sl)->myShader->setFloat("FAR_CHUNKS_DISTANCE", 100);
+		(*sl)->myShader->setFloat("RENDER_DISTANCE", 100);
+	}
 
 	std::unordered_map<ChunkPos,RenderChunk*[8]> rc;
 
 	//std::unordered_set<ChunkPos> renderChunkMap;
 
 	std::unordered_set<ChunkPos> needsReRendering;
+	std::unordered_set<ChunkPos> needsReRendering2;
+
+	std::unique_ptr chunkBuilder = make_unique<RenderChunkBuilder>(commandContext.dim->getChunkSource());
+
+
 
 	while (!glfwWindowShouldClose(window)) 
 	{
@@ -846,7 +859,10 @@ void renderThreadStuff()
 		glm::mat4 view = glm::lookAt(c.mPos, c.mPos + c.cameraFront, c.cameraUp);
 		
 		//chunkMaterial->myShader->setVector4("CHUNK_ORIGIN_AND_SCALE", glm::vec4(0, 0, 0, 1));
-		chunkMaterial->myShader->setMatrix4("WORLDVIEW", glm::value_ptr(view));
+		for (auto sl : mptrs)
+		{
+			(*sl)->myShader->setMatrix4("WORLDVIEW", glm::value_ptr(view));
+		}
 
 		ChunkPos camChunkPos(c.mPos.x/16,c.mPos.z/16);
 		int renderDistance = 3;
@@ -879,6 +895,13 @@ void renderThreadStuff()
 
 				if (commandContext.dim->getChunkSource().getOrLoadChunk(pos, ChunkSource::LoadMode::None)->getState() == ChunkState::Loaded)
 				{
+					needsReRendering2.insert(pos);
+					for (int i = 1; i < 9; i++)
+					{
+						if(commandContext.dim->getChunkSource().getOrLoadChunk(pos + offsets[i], ChunkSource::LoadMode::None)->getState() == ChunkState::Loaded)
+							needsReRendering2.insert(pos+offsets[i]);
+					}
+					/*
 					std::cout << "Rendering chunk at " << pos.x << ", " << pos.z << " ChunkPos\n";
 					//int k = rc.size();
 					for (int i = 0; i < 8; i++)
@@ -890,14 +913,14 @@ void renderThreadStuff()
 
 						RenderChunk* chunkPart = new RenderChunk(cp);
 
-						chunkPart->startRebuild(make_unique<RenderChunkBuilder>(commandContext.dim->getChunkSource()));
+						chunkPart->startRebuild(std::move(chunkBuilder));
 						chunkPart->rebuild(false, true);
-						chunkPart->endRebuild(Vec3(c.mPos.x, c.mPos.y, c.mPos.z));
-						/*					chunkPart->startFaceSort(make_unique<RenderChunkSorter>());
-						chunkPart->faceSort();
-						chunkPart->endFaceSort();*/
+						chunkBuilder = chunkPart->endRebuild(Vec3(c.mPos.x, c.mPos.y, c.mPos.z));
+						//					chunkPart->startFaceSort(make_unique<RenderChunkSorter>());
+						//chunkPart->faceSort();
+						//chunkPart->endFaceSort();*
 						rc[cp][i] = chunkPart;
-					}
+					}*/
 					it = needsReRendering.erase(it);
 					//renderChunkMap.insert(pos);
 				}
@@ -907,21 +930,54 @@ void renderThreadStuff()
 				}
 			}
 
+
+
+
+
+
+			for (auto it = needsReRendering2.begin(); it != needsReRendering2.end(); )
+			{
+				ChunkPos pos = *it;
+
+					std::cout << "Rendering chunk at " << pos.x << ", " << pos.z << " ChunkPos\n";
+					//int k = rc.size();
+					for (int i = 0; i < 8; i++)
+					{
+						BlockPos cp(pos.x * 16, i * 16, pos.z * 16);
+
+
+						
+
+						if(rc[cp][i] == nullptr)
+							rc[cp][i] = new RenderChunk(cp);
+						else
+							rc[cp][i]->setDirty(Tick(0), true);
+
+						RenderChunk* chunkPart = rc[cp][i];
+						chunkPart->setDirty(Tick(0), true);
+
+						chunkPart->startRebuild(std::move(chunkBuilder));
+						chunkPart->rebuild(false, true);
+						chunkBuilder = chunkPart->endRebuild(Vec3(c.mPos.x, c.mPos.y, c.mPos.z));
+					}
+					it = needsReRendering2.erase(it);
+			}
+
+
+
+
+
+
+
+
+
+
 		//m.render();
 		for (auto & lc : rc)
 		{
 			for (int i = 0; i < 8; i++)
 			{
-				//glm::mat4 model(1);
-
 				BlockPos position = lc.second[i]->getPosition();
-
-				//model = glm::translate(model, glm::vec3(position.x, position.y, position.z));
-
-				//glm::mat4 mv = model * view;
-
-
-				//
 				lc.second[i]->updateFaceSortState(Vec3(c.mPos.x, c.mPos.y, c.mPos.z));//
 				if (lc.second[i]->isFaceSortDirty())
 				{
@@ -929,8 +985,11 @@ void renderThreadStuff()
 					lc.second[i]->faceSort();
 					lc.second[i]->endFaceSort();
 				}
-				
-				chunkMaterial->myShader->setVector4("CHUNK_ORIGIN_AND_SCALE", glm::vec4(position.x, position.y, position.z, 1));
+
+				for (auto sl : mptrs)
+				{
+					(*sl)->myShader->setVector4("CHUNK_ORIGIN_AND_SCALE", glm::vec4(position.x, position.y, position.z, 1));
+				}
 
 				RenderChunkRenderParameters renderParams;
 				renderParams.layer = TerrainLayer::Opaque;//Blend;//?
@@ -941,9 +1000,27 @@ void renderThreadStuff()
 				//shader.setMatrix4("model", glm::value_ptr(model));
 				if (lc.second[i]->hasLayer(renderParams.layer))
 					lc.second[i]->render(renderParams, currentFrame);
+			}
+		}
 
+		for (auto& lc : rc)
+		{
+			for (int i = 0; i < 8; i++)
+			{
+				BlockPos position = lc.second[i]->getPosition();
+
+				for (auto sl : mptrs)
+				{
+					(*sl)->myShader->setVector4("CHUNK_ORIGIN_AND_SCALE", glm::vec4(position.x, position.y, position.z, 1));
+				}
+
+				RenderChunkRenderParameters renderParams;
 				renderParams.layer = TerrainLayer::Water;
+				renderParams.forceUnsorted = false;
+				renderParams.forceFog = false;
 
+
+				//shader.setMatrix4("model", glm::value_ptr(model));
 				if (lc.second[i]->hasLayer(renderParams.layer))
 					lc.second[i]->render(renderParams, currentFrame);
 			}
